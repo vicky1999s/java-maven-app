@@ -1,0 +1,27 @@
+# Compiled class files
+*.class
+
+# Compiled Java source (if using Maven or Gradle)
+target/
+build/
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Dependency directories (if using Maven)
+/.m2/
+
+# IDE files and directories (if using IntelliJ IDEA or Eclipse)
+.idea/
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
