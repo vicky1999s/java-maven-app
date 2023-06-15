@@ -26,5 +26,11 @@ pipeline{
                 }
             }
         }
+
+        stage('DELIVER'){
+            steps{
+                bat 'jenkins/scripts/deliver.bat'
+            }
+        }
     }
 }
