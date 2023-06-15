@@ -31,6 +31,12 @@ pipeline{
             steps{
                 bat './jenkins/scripts/deliver.bat'
             }
+
+            post{
+                success{
+                    cleanWs disableDeferredWipeout: true, deleteDirs: true
+                }
+            }
         }
     }
 }
