@@ -11,6 +11,7 @@ pipeline{
         stage('BUILD'){
             steps{
                 bat 'mvn -DskipTests package'
+                echo '=====build completed======='
             }
         }
 
