@@ -13,6 +13,15 @@ pipeline{
                 bat 'mvn -DskipTests package'
                 echo '=====build completed======='
             }
+
+            post{
+                success{
+                    publishChecks name: 'example', title: 'Pipeline Check', summary: 'check through pipeline',
+    text: 'you can publish checks in pipeline script',
+    detailsURL: 'https://github.com/vicky1999s/java-maven-app#master',
+    actions: [[label:'an-user-request-action', description:'actions allow users to request pre-defined behaviours', identifier:'an unique identifier']]
+                }
+            }
         }
 
         stage('TEST'){
