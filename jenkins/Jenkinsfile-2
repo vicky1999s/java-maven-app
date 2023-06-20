@@ -8,14 +8,14 @@ pipeline{
 
         stage('BUILD'){
             steps{
-                bat 'mvn -DskipTests package'
+                sh 'mvn -DskipTests package'
                 echo '=====build completed======='
             }
         }
 
         stage('TEST'){
             steps{
-                bat 'mvn test'
+                sh 'mvn test'
             }
             
             post{
