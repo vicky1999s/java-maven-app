@@ -4,6 +4,10 @@ pipeline{
         label 'linux'
     }
 
+    tools{
+        maven 'maven-linux'
+    }
+
     stages{
 
         stage('BUILD'){
