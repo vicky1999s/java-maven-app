@@ -1,0 +1,28 @@
+pipeline{
+
+    agent {
+        label 'linux'
+    }
+
+    stages{
+
+        stage('BUILD'){
+            steps{
+                bat 'mvn -DskipTests package'
+                echo '=====build completed======='
+            }
+        }
+
+        stage('TEST'){
+            steps{
+                bat 'mvn test'
+            }
+            
+            post{
+                always{
+                    junit skipPublishingChecks: true, testResults: 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+    }
+}
