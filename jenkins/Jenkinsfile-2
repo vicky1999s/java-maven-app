@@ -12,6 +12,7 @@ pipeline{
 
         stage('BUILD'){
             steps{
+                echo "maven home: ${env.MAVEN_HOME}"
                 sh 'mvn -DskipTests package'
                 echo '=====build completed======='
             }
