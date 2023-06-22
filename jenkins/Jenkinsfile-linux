@@ -56,7 +56,7 @@ pipeline{
                             s3Bucket: 'vickyjenkinstesting',
                             s3Key: "${YEAR}/${MONTH}",
                             s3BundleType: 'zip', // [Valid values: tar | tgz | zip | YAML | JSON]
-                            applicationName: "${FILENAME}",
+                            applicationName: 'java-maven-app',
                             deploymentGroupName: 'java-maven-app',
                             deploymentConfigName: 'CodeDeployDefault.AllAtOnce',
                             description: 'Test Deployment',
