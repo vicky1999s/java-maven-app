@@ -29,6 +29,7 @@ pipeline{
                 }
 
                 success{
+                    sh 'chmod +x jenkins/scripts/project_name.sh'
                     sh './jenkins/scripts/project_name.sh' 
                     withAWS(credentials:'jenkins-controller'){
                         s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'target/${FILE_NAME}', bucket:'vickyjenkinstesting', path:'${YEAR}/${MONTH}')
