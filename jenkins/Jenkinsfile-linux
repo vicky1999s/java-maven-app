@@ -19,16 +19,17 @@ pipeline{
         }
 
         stage('TEST'){
+        
+            steps{
+                sh 'mvn test'
+            }
+
             environment{
                 MONTH = sh(returnStdout: true, script: 'date "+%m"').trim()
                 YEAR = sh(returnStdout: true, script: 'date "+%Y"').trim()
                 PROJECT_NAME = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.name -q -DforceStdout').trim()
                 PROJECT_VERSION = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout').trim()
                 FILENAME = sh(returnStdout: true, script: "${PROJECT_NAME}-${PROJECT_VERSION}.jar").trim()
-            }
-
-            steps{
-                sh 'mvn test'
             }
             
             post{
@@ -38,7 +39,7 @@ pipeline{
 
                 success{
                     withAWS(credentials:'jenkins-controller'){
-                        s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:"target/${FILE_NAME}", bucket:'vickyjenkinstesting', path:"${YEAR}/${MONTH}")
+                        s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:"target/${FILENAME}", bucket:'vickyjenkinstesting', path:"${YEAR}/${MONTH}")
                     }
                 }
             }
