@@ -29,13 +29,7 @@ pipeline{
                 }
 
                 success{
-                    sh '''
-                        MONTH=$(date "+%m")
-                        YEAR=$(data "+%Y")
-                        PROJECT_NAME=$(mvn help:evaluate -Dexpression=project.name | grep "^[^\[]]")
-                        PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version | grep "^[^\[]]")
-                        FILE_NAME=${PROJECT_NAME}-${PROJECT_VERSION}.jar
-                    '''
+                    sh './jenkins/scripts/project_name.sh' 
                     withAWS(credentials:'jenkins-controller'){
                         s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'target/${FILE_NAME}', bucket:'vickyjenkinstesting', path:'${YEAR}/${MONTH}')
                     }
