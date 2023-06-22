@@ -1,0 +1,64 @@
+pipeline{
+
+    agent {
+        label 'linux'
+    }
+
+    tools{
+        maven 'maven-linux'
+    }
+
+    stages{
+
+        stage('BUILD'){
+            steps{
+                echo "maven home: ${env.MAVEN_HOME}"
+                sh 'mvn -DskipTests package'
+                echo '=====build completed======='
+            }
+        }
+
+        stage('TEST'){
+            steps{
+                sh 'mvn test'
+            }
+            
+            post{
+                always{
+                    junit testResults: 'target/surefire-reports/*.xml'
+                }
+
+                success{
+                    sh '''
+                        MONTH=$(date "+%m")
+                        YEAR=$(data "+%Y")
+                        PROJECT_NAME=$(mvn help:evaluate -Dexpression=project.name | grep "^[^\[]]")
+                        PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version | grep "^[^\[]]")
+                        FILE_NAME=${PROJECT_NAME}-${PROJECT_VERSION}.jar
+                    '''
+                    withAWS(credentials:'jenkins-controller'){
+                        s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'target/${FILE_NAME}', bucket:'vickyjenkinstesting', path:'${YEAR}/${MONTH}')
+                    }
+                }
+            }
+        }
+
+        // stage('DEPLOY'){
+        //     steps{
+        //         createDeployment(
+        //                 s3Bucket: 'jenkins.bucket',
+        //                 s3Key: 'artifacts/SimpleWebApp.zip',
+        //                 s3BundleType: 'zip', // [Valid values: tar | tgz | zip | YAML | JSON]
+        //                 applicationName: 'SampleWebApp',
+        //                 deploymentGroupName: 'SampleDeploymentGroup',
+        //                 deploymentConfigName: 'CodeDeployDefault.AllAtOnce',
+        //                 description: 'Test deploy',
+        //                 waitForCompletion: 'true',
+        //                 //Optional values 
+        //                 ignoreApplicationStopFailures: 'false',
+        //                 fileExistsBehavior: 'OVERWRITE'// [Valid values: DISALLOW, OVERWRITE, RETAIN]
+        //         )
+        //     }
+        // }
+    }
+}
