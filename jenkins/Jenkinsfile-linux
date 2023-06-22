@@ -1,5 +1,8 @@
-pipeline{
+def FILENAME = 'UNKNOWN'
+def MONTH    = 'UNKNOWN'
+def YEAR     = 'UNKNOWN'
 
+pipeline{
     agent {
         label 'linux'
     }
@@ -19,17 +22,17 @@ pipeline{
         }
 
         stage('TEST'){
-
-            environment{
-                MONTH = sh(returnStdout: true, script: 'date "+%m"').trim()
-                YEAR = sh(returnStdout: true, script: 'date "+%Y"').trim()
-                PROJECT_NAME = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.name -q -DforceStdout').trim()
-                PROJECT_VERSION = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout').trim()
-                FILENAME = sh(returnStdout: true, script: "echo \"${PROJECT_NAME}-${PROJECT_VERSION}.jar\"").trim()
-            }
-            
             steps{
+                script{
+                    MONTH = sh(returnStdout: true, script: 'date "+%m"').trim()
+                    YEAR = sh(returnStdout: true, script: 'date "+%Y"').trim()
+                    PROJECT_NAME = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.name -q -DforceStdout').trim()
+                    PROJECT_VERSION = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout').trim()
+                    FILENAME = sh(returnStdout: true, script: "echo \"${PROJECT_NAME}-${PROJECT_VERSION}.jar\"").trim()
+                }
+
                 sh 'mvn test'
+                echo "filename: ${FILENAME}"
             }
 
             post{
@@ -39,28 +42,31 @@ pipeline{
 
                 success{
                     withAWS(credentials:'jenkins-controller'){
-                        s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:"target/${FILENAME}", bucket:'vickyjenkinstesting', path:"${YEAR}/${MONTH}")
+                        s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:"target/${FILENAME}", bucket:'vickyjenkinstesting', path:"${YEAR}/${MONTH}/")
                     }
                 }
             }
         }
 
-        // stage('DEPLOY'){
-        //     steps{
-        //         createDeployment(
-        //                 s3Bucket: 'jenkins.bucket',
-        //                 s3Key: 'artifacts/SimpleWebApp.zip',
-        //                 s3BundleType: 'zip', // [Valid values: tar | tgz | zip | YAML | JSON]
-        //                 applicationName: 'SampleWebApp',
-        //                 deploymentGroupName: 'SampleDeploymentGroup',
-        //                 deploymentConfigName: 'CodeDeployDefault.AllAtOnce',
-        //                 description: 'Test deploy',
-        //                 waitForCompletion: 'true',
-        //                 //Optional values 
-        //                 ignoreApplicationStopFailures: 'false',
-        //                 fileExistsBehavior: 'OVERWRITE'// [Valid values: DISALLOW, OVERWRITE, RETAIN]
-        //         )
-        //     }
-        // }
+        stage('DEPLOY'){
+            steps{
+                echo "FILENAME: ${FILENAME}"
+                withAWS(credentials:'jenkins-controller'){
+                    createDeployment(
+                            s3Bucket: 'vickyjenkinstesting',
+                            s3Key: "${YEAR}/${MONTH}",
+                            s3BundleType: 'zip', // [Valid values: tar | tgz | zip | YAML | JSON]
+                            applicationName: ${FILENAME},
+                            deploymentGroupName: 'java-maven-app',
+                            deploymentConfigName: 'CodeDeployDefault.AllAtOnce',
+                            description: 'Test Deployment',
+                            waitForCompletion: 'true',
+                            //Optional values 
+                            ignoreApplicationStopFailures: 'false',
+                            fileExistsBehavior: 'OVERWRITE'// [Valid values: DISALLOW, OVERWRITE, RETAIN]
+                    )
+                }
+            }
+        }
     }
 }
