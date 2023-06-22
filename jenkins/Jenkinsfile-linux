@@ -22,8 +22,8 @@ pipeline{
             environment{
                 MONTH = sh(returnStdout: true, script: 'date "+%m"').trim()
                 YEAR = sh(returnStdout: true, script: 'date "+%Y"').trim()
-                PROJECT_NAME = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.name | grep "^[^\[]"').trim()
-                PROJECT_VERSION = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version | grep "^[^\[]"').trim()
+                PROJECT_NAME = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.name | grep "^w.*"').trim()
+                PROJECT_VERSION = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version | grep "^w.*"').trim()
                 FILENAME = sh(returnStdout: true, script: "${PROJECT_NAME}-${PROJECT_VERSION}.jar").trim()
             }
 
