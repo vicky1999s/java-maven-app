@@ -51,7 +51,7 @@ pipeline{
         stage('DEPLOY'){
             steps{
                 echo "FILENAME: ${FILENAME}"
-                withAWS(credentials:'jenkins-controller'){
+                withAWS(credentials:'jenkins-controller', region:'ap-south-1'){
                     createDeployment(
                             s3Bucket: 'vickyjenkinstesting',
                             s3Key: "${YEAR}/${MONTH}",
