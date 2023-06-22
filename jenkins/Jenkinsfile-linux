@@ -19,19 +19,19 @@ pipeline{
         }
 
         stage('TEST'){
-        
-            steps{
-                sh 'mvn test'
-            }
 
             environment{
                 MONTH = sh(returnStdout: true, script: 'date "+%m"').trim()
                 YEAR = sh(returnStdout: true, script: 'date "+%Y"').trim()
                 PROJECT_NAME = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.name -q -DforceStdout').trim()
                 PROJECT_VERSION = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout').trim()
-                FILENAME = sh(returnStdout: true, script: "${PROJECT_NAME}-${PROJECT_VERSION}.jar").trim()
+                FILENAME = sh(returnStdout: true, script: "echo \"${PROJECT_NAME}-${PROJECT_VERSION}.jar\"").trim()
             }
             
+            steps{
+                sh 'mvn test'
+            }
+
             post{
                 always{
                     junit testResults: 'target/surefire-reports/*.xml'
