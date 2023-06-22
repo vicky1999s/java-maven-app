@@ -1,3 +1,5 @@
+#!/bin/bash
+
 MONTH=$(date "+%m")
 YEAR=$(data "+%Y")
 PROJECT_NAME=$(mvn help:evaluate -Dexpression=project.name | grep "^[^\[]")
