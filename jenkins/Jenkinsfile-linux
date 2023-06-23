@@ -41,7 +41,7 @@ pipeline{
                 }
 
                 success{
-                    zip defaultExcludes: false, dir: '', exclude: '', glob: "appspec.yaml, scripts/*, target/${FILENAME}.jar", overwrite: true, zipFile: "${FILENAME}.zip"
+                    zip defaultExcludes: false, dir: '', exclude: '', glob: "appspec.yml, scripts/*, target/${FILENAME}.jar", overwrite: true, zipFile: "${FILENAME}.zip"
                     withAWS(credentials:'jenkins-controller'){
                         s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:"${FILENAME}.zip", bucket:'vickyjenkinstesting', path:"${YEAR}/${MONTH}/")
                     }
