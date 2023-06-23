@@ -28,11 +28,11 @@ pipeline{
                     YEAR = sh(returnStdout: true, script: 'date "+%Y"').trim()
                     PROJECT_NAME = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.name -q -DforceStdout').trim()
                     PROJECT_VERSION = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout').trim()
-                    FILENAME = sh(returnStdout: true, script: "echo \"${PROJECT_NAME}-${PROJECT_VERSION}.jar\"").trim()
+                    FILENAME = sh(returnStdout: true, script: "echo \"${PROJECT_NAME}-${PROJECT_VERSION}\"").trim()
                 }
 
                 sh 'mvn test'
-                echo "filename: ${FILENAME}"
+                echo "filename: ${FILENAME}.jar"
             }
 
             post{
@@ -41,8 +41,9 @@ pipeline{
                 }
 
                 success{
+                    zip defaultExcludes: false, dir: '', exclude: '', glob: "appspec.yaml, scripts/*, target/${FILENAME}.jar", overwrite: true, zipFile: "${FILENAME}.zip"
                     withAWS(credentials:'jenkins-controller'){
-                        s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:"target/${FILENAME}", bucket:'vickyjenkinstesting', path:"${YEAR}/${MONTH}/")
+                        s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:"${FILENAME}.zip", bucket:'vickyjenkinstesting', path:"${YEAR}/${MONTH}/")
                     }
                 }
             }
@@ -54,7 +55,7 @@ pipeline{
                 withAWS(credentials:'jenkins-controller', region:'ap-south-1'){
                     createDeployment(
                             s3Bucket: 'vickyjenkinstesting',
-                            s3Key: "${YEAR}/${MONTH}",
+                            s3Key: "${YEAR}/${MONTH}/${FILENAME}.zip",
                             s3BundleType: 'zip', // [Valid values: tar | tgz | zip | YAML | JSON]
                             applicationName: 'java-maven-app',
                             deploymentGroupName: 'java-maven-app',

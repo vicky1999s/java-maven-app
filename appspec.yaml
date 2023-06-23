@@ -1,0 +1,27 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/server
+permissions:
+  - object: /home/ubuntu/server
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+hooks:
+  ApplicationStop:
+    - location: scripts/application_stop.sh
+      timeout: 10
+      runas: ubuntu
+  BeforeInstall:
+    - location: scripts/application_clear.sh
+      timeout: 10
+      runas: ubuntu
+  AfterInstall:
+    - location: scripts/fix_permission.sh
+      timeout: 10
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/application_start.sh
+      timeout: 60
+      runas: ubuntu
