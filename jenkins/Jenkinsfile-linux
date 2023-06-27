@@ -62,7 +62,6 @@ pipeline{
                             deploymentConfigName: 'CodeDeployDefault.AllAtOnce',
                             description: 'Test Deployment',
                             waitForCompletion: 'true',
-                            //Optional values 
                             ignoreApplicationStopFailures: 'false',
                             fileExistsBehavior: 'OVERWRITE'// [Valid values: DISALLOW, OVERWRITE, RETAIN]
                     )
